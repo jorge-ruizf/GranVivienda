@@ -1,0 +1,24 @@
+{
+  "id": "casa-2",
+  "slug": "casa-contemporanea-laureles",
+  "title": "Casa contemporánea en Laureles",
+  "operation": "rent",
+  "propertyType": "house",
+  "price": 4000000,
+  "currency": "COP",
+  "location": {
+    "city": "Medellín",
+    "neighborhood": "Laureles"
+  },
+  "description": "Casa contemporánea con diseño arquitectónico destacado en Laureles. Cuenta con sala de estar, comedor formal, cocina gourmet y amplia zona de estar. Jardín con paisajismo profesional. Excelente ubicación cerca del Estadio y vías principales.",
+  "bedrooms": 3,
+  "bathrooms": 2,
+  "area": 150,
+  "images": [
+    { "src": "/images/properties/casa-2/fachada.jpg", "alt": "Fachada contemporánea" },
+    { "src": "/images/properties/casa-2/sala.jpg", "alt": "Sala con diseño moderno" },
+    { "src": "/images/properties/casa-2/cocina.jpg", "alt": "Cocina gourmet" },
+    { "src": "/images/properties/casa-2/patio.jpg", "alt": "Patio interior con vegetación" }
+  ],
+  "featured": false
+}

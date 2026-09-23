@@ -1,0 +1,64 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import PropertyCard from "../../components/PropertyCard.astro";
+import { getAllProperties } from "../../data/properties";
+
+const properties = getAllProperties();
+---
+
+<Layout
+  title="Propiedades en arriendo"
+  description="Explora nuestro catálogo de propiedades en arriendo en Medellín. Apartamentos, casas y estudios en La América y alrededores."
+>
+  <section class="page-header">
+    <div class="container">
+      <h1 class="page-header__title">Propiedades en arriendo</h1>
+      <p class="page-header__subtitle">
+        Encuentra tu próximo hogar entre {properties.length} propiedades disponibles en Medellín.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="grid grid--3">
+        {properties.map((property) => (
+          <PropertyCard property={property} />
+        ))}
+      </div>
+
+      {properties.length === 0 && (
+        <div class="empty-state">
+          <p>No hay propiedades disponibles en este momento.</p>
+        </div>
+      )}
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .page-header {
+    background-color: var(--color-white);
+    border-bottom: 1px solid var(--color-gray-200);
+    padding: 3rem 0;
+  }
+
+  .page-header__title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-gray-900);
+    margin-bottom: 0.5rem;
+  }
+
+  .page-header__subtitle {
+    font-size: 1rem;
+    color: var(--color-gray-600);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--color-gray-500);
+    font-size: 1.125rem;
+  }
+</style>

@@ -1,0 +1,23 @@
+{
+  "id": "apartamento-2",
+  "slug": "apartamento-acogedor-el-poblado",
+  "title": "Apartamento acogedor en El Poblado",
+  "operation": "rent",
+  "propertyType": "apartment",
+  "price": 2200000,
+  "currency": "COP",
+  "location": {
+    "city": "Medellín",
+    "neighborhood": "El Poblado"
+  },
+  "description": "Acogedor apartamento de 2 habitaciones en uno de los barrios más prestigiosos de Medellín. Cerca a restaurantes, parques y vida nocturna. Ideal para profesionales jóvenes que buscan comodidad y ubicación privilegiada.",
+  "bedrooms": 2,
+  "bathrooms": 1,
+  "area": 55,
+  "images": [
+    { "src": "/images/properties/apartamento-2/sala.jpg", "alt": "Sala con decoración moderna" },
+    { "src": "/images/properties/apartamento-2/cocina.jpg", "alt": "Cocina tipo americana" },
+    { "src": "/images/properties/apartamento-2/habitacion.jpg", "alt": "Habitación con vista exterior" }
+  ],
+  "featured": false
+}

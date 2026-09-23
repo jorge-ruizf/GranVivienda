@@ -1,0 +1,26 @@
+{
+  "id": "casa-1",
+  "slug": "casa-familiar-la-americ",
+  "title": "Casa familiar en La América",
+  "operation": "rent",
+  "propertyType": "house",
+  "price": 3500000,
+  "currency": "COP",
+  "location": {
+    "city": "Medellín",
+    "neighborhood": "La América"
+  },
+  "description": "Hermosa casa familiar con jardín amplio en La América. Perfecta para familias que buscan tranquilidad y espacio en una zona céntrica. Cuenta con 3 niveles, garaje para dos vehículos y depósito. Cerca al Parque de los Deseos y al Metro.",
+  "bedrooms": 4,
+  "bathrooms": 3,
+  "area": 180,
+  "images": [
+    { "src": "/images/properties/casa-1/fachada.jpg", "alt": "Fachada de la casa con jardín" },
+    { "src": "/images/properties/casa-1/sala.jpg", "alt": "Sala principal con chimenea" },
+    { "src": "/images/properties/casa-1/comedor.jpg", "alt": "Comedor familiar amplio" },
+    { "src": "/images/properties/casa-1/cocina.jpg", "alt": "Cocina integral con isla" },
+    { "src": "/images/properties/casa-1/jardin.jpg", "alt": "Jardín trasero con área de BBQ" },
+    { "src": "/images/properties/casa-1/habitacion.jpg", "alt": "Habitación principal con baño privado" }
+  ],
+  "featured": true
+}

@@ -1,0 +1,38 @@
+{
+  "id": "apartamento-1",
+  "slug": "apartamento-san-javier",
+  "title": "Apartamento en San Javier",
+  "operation": "sale",
+  "propertyType": "apartment",
+  "price": 230000000,
+  "currency": "COP",
+  "location": {
+    "city": "Medellín",
+    "neighborhood": "San Javier"
+  },
+  "description": "Amplio apartamento de 3 habitaciones en San Javier. Cuenta con multiples habitaciones y dos pisos.",
+  "bedrooms": 3,
+  "bathrooms": 2,
+  "area": 77,
+"images": [
+    { "src": "/images/properties/apartamento-1/entrada.jpg", "alt": "Entrada" },
+    { "src": "/images/properties/apartamento-1/sala-1.jpg", "alt": "Sala 1" },
+    { "src": "/images/properties/apartamento-1/sala-2.jpg", "alt": "Sala 2" },
+    { "src": "/images/properties/apartamento-1/sala-3.jpg", "alt": "Sala 3" },
+    { "src": "/images/properties/apartamento-1/cocina-1.jpg", "alt": "Cocina 1" },
+    { "src": "/images/properties/apartamento-1/cocina-2.jpg", "alt": "Cocina 2" },
+    { "src": "/images/properties/apartamento-1/bano-1.jpg", "alt": "Baño 1" },
+    { "src": "/images/properties/apartamento-1/habitacion-1.jpg", "alt": "Habitación 1" },
+    { "src": "/images/properties/apartamento-1/sala-4.jpg", "alt": "Sala 4" },
+    { "src": "/images/properties/apartamento-1/sala-5.jpg", "alt": "Sala 5" },
+    { "src": "/images/properties/apartamento-1/escaleras.jpg", "alt": "Escaleras" },
+    { "src": "/images/properties/apartamento-1/habitacion-2.jpg", "alt": "Habitación 2" },
+    { "src": "/images/properties/apartamento-1/habitacion-3.jpg", "alt": "Habitación 3" },
+    { "src": "/images/properties/apartamento-1/habitacion-4.jpg", "alt": "Habitación 4" },
+    { "src": "/images/properties/apartamento-1/habitacion-5.jpg", "alt": "Habitación 5" },
+    { "src": "/images/properties/apartamento-1/habitacion-6.jpg", "alt": "Habitación 6" },
+    { "src": "/images/properties/apartamento-1/bano-2.jpg", "alt": "Baño 2" },
+    { "src": "/images/properties/apartamento-1/patio.jpg", "alt": "Patio" }
+  ],
+  "featured": true
+}
