@@ -22,7 +22,8 @@
     "Segundo piso",
     "REQUISITO PRINCIPAL:",
     "fiador con propiedad raíz, sin afectación familiar, no embargo ni hipoteca,",
-    "o dos fiadores q demuestren ingresos al valor doble del canon."
+    "o dos fiadores q demuestren ingresos al valor doble del canon",
+    "Ubicado en la Cra 99 #66e-43"
   ],
   "features": [
     { "key": "bedrooms", "value": 2 },
@@ -32,8 +33,8 @@
   "media": [
     { "src": "/images/properties/apartamento-1/nombre-1.jpeg", "alt": "Señal de entrada del conjunto Luna del Viento" },
     {
-      "type": "video",
-      "src": "/images/properties/apartamento-1/video-1.mp4",
+      "type": "youtube",
+      "url": "",
       "alt": "Recorrido en video de la propiedad"
     }
   ],

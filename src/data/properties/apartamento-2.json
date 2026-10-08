@@ -35,8 +35,8 @@
     { "src": "/images/properties/apartamento-2/WhatsApp Image 2026-10-06 at 4.27.04 PM.jpeg", "alt": "Vestidor y puerta de habitación" },
     { "src": "/images/properties/apartamento-2/WhatsApp Image 2026-10-06 at 4.27.04 PM (1).jpeg", "alt": "Escalera y acceso a la propiedad" },
     {
-      "type": "video",
-      "src": "/images/properties/apartamento-2/WhatsApp Video 2026-10-06 at 4.27.03 PM.mp4",
+      "type": "youtube",
+      "url": "",
       "alt": "Recorrido en video de la propiedad"
     }
   ],

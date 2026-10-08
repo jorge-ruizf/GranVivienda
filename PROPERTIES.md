@@ -39,13 +39,10 @@ Cada archivo genera automáticamente una página de detalle en `/propiedades/{sl
   "media": [
     { "src": "/images/properties/apartamento-1/sala.jpg", "alt": "Sala principal" },
     {
-      "type": "video",
-      "src": "/videos/properties/apartamento-1/recorrido.mp4",
+      "type": "youtube",
+      "url": "https://www.youtube.com/watch?v=AbCdEfGhIjK",
       "alt": "Recorrido en video",
-      "poster": "/images/properties/apartamento-1/recorrido-poster.jpg",
-      "sources": [
-        { "src": "/videos/properties/apartamento-1/recorrido.webm", "type": "video/webm" }
-      ]
+      "orientation": "landscape"
     }
   ],
   "featured": true
@@ -70,12 +67,12 @@ Cada archivo genera automáticamente una página de detalle en `/propiedades/{sl
 | `features` | array | Sí | Características de la propiedad (puede ser un array vacío `[]`) |
 | `features[].key` | string | Sí | Clave de la característica (ver tabla de claves soportadas) |
 | `features[].value` | number | Sí | Valor numérico (`0` se oculta en la interfaz) |
-| `media` | array | Sí | Lista de imágenes y videos (puede ser un array vacío `[]`) |
-| `media[].src` | string | Sí | Ruta del archivo (debe empezar con `/`) |
+| `media` | array | Sí | Lista de imágenes y videos de YouTube (puede ser un array vacío `[]`) |
+| `media[].src` | string | Sí* | (Imágenes) ruta del archivo (debe empezar con `/`) |
 | `media[].alt` | string | Sí | Texto alternativo / descripción del medio |
-| `media[].type` | string | No | `"video"` para videos; las imágenes pueden omitirlo |
-| `media[].poster` | string | No | (Videos) imagen de portada para la miniatura y la galería |
-| `media[].sources` | array | No | (Videos) fuentes adicionales `[{"src", "type"}]` |
+| `media[].type` | string | No | `"youtube"` para videos de YouTube; las imágenes pueden omitirlo |
+| `media[].url` | string | Sí* | (YouTube) enlace del video: `watch?v=`, `youtu.be/`, `shorts/`, `embed/`, `live/` o ID de 11 caracteres. `""` muestra un placeholder "próximamente" |
+| `media[].orientation` | string | No | (YouTube) `"portrait"` o `"landscape"`; si se omite se infiere (`/shorts/` → vertical) |
 | `featured` | boolean | Sí | `true` para aparecer en la página de inicio |
 
 ## Descripción (`description`)
@@ -148,7 +145,7 @@ La tarjeta de propiedad muestra hasta 3 características marcadas con `showOnCar
 
 ## Medios (`media`)
 
-Imágenes y videos conviven en el mismo array y en la misma galería.
+Imágenes locales y videos de YouTube conviven en el mismo array y en la misma galería.
 
 ### Imágenes
 
@@ -162,38 +159,54 @@ Imágenes y videos conviven en el mismo array y en la misma galería.
 { "src": "/images/properties/apartamento-1/sala.jpg", "alt": "Sala principal" }
 ```
 
-### Videos
+### Videos de YouTube
 
-- Formatos soportados: **MP4 / H.264**, **WebM** y **Ogg** (según navegador)
-- Se reproducen con el `<video>` nativo del navegador (sin librerías)
-- Ruta sugerida: `public/videos/properties/{id}/`
-- El array acepta MP4 como `src` principal y formatos extra en `sources`
-- `poster` (recomendado): imagen de portada usada en miniaturas y en el fondo de la galería
-- Los videos se reproducen **silenciados** con controles nativos; el usuario puede activar el sonido desde los controles
+- **No se guardan videos locales**: el array solo acepta enlaces de YouTube
+- Formatos de enlace aceptados en `url`:
+  - `https://www.youtube.com/watch?v=VIDEO_ID`
+  - `https://youtu.be/VIDEO_ID`
+  - `https://www.youtube.com/shorts/VIDEO_ID` (verticales / Shorts)
+  - `https://www.youtube.com/embed/VIDEO_ID`
+  - `https://www.youtube.com/live/VIDEO_ID`
+  - Un ID suelto de 11 caracteres (`VIDEO_ID`)
+- Se reproducen con el **IFrame Player API oficial de YouTube** (sin librerías de terceros);
+  el script solo se carga en páginas cuya galería tiene videos de YouTube
+- Reproducción **silenciada automática** al activar el video; el usuario activa el sonido
+  desde los controles nativos de YouTube (controles y pantalla completa disponibles)
+- Miniatura tomada de `https://img.youtube.com/vi/{id}/hqdefault.jpg`
+- `url: ""` (o enlace inválido): se muestra un placeholder **"Video de YouTube próximamente"**
+  y la galería lo trata como una imagen (avanza cada 2.5 s)
+- `orientation`: `"portrait"` (9:16) o `"landscape"` (16:9). Si se omite, se infiere
+  del enlace (`/shorts/` → vertical). Los Shorts verticales se centran con fondo difuminado
 
 ```json
 {
-  "type": "video",
-  "src": "/videos/properties/apartamento-1/recorrido.mp4",
+  "type": "youtube",
+  "url": "https://www.youtube.com/shorts/AbCdEfGhIjK",
   "alt": "Recorrido en video por la propiedad",
-  "poster": "/images/properties/apartamento-1/recorrido-poster.jpg",
-  "sources": [
-    { "src": "/videos/properties/apartamento-1/recorrido.webm", "type": "video/webm" },
-    { "src": "/videos/properties/apartamento-1/recorrido.ogv", "type": "video/ogg" }
-  ]
+  "orientation": "portrait"
 }
 ```
 
-Miniaturas de video sin `poster`: la galería muestra el primer frame del video.
+Placeholder mientras no hay video:
+
+```json
+{ "type": "youtube", "url": "", "alt": "Recorrido en video de la propiedad" }
+```
 
 ### Galería (comportamiento)
 
 - Las **imágenes** avanzan automáticamente cada **2.5 segundos**.
-- Un **video** activo se reproduce completo (silenciado, con controles nativos) y la
-  galería avanza sola cuando termina (`ended`). No hay temporizador para videos.
-- Si el usuario pausa o rebobina el video con los controles, la galería espera.
-- Las flechas y miniaturas cambian de medio en cualquier momento y reinician el video.
-- Al pasar el cursor (o tocar en móvil) se pausa la navegación automática; al salir se reanuda.
+- Un **video de YouTube** activo se reproduce solo (silenciado, con controles nativos) y la
+  galería avanza sola cuando termina (`ENDED`). No hay temporizador para videos.
+- Si el usuario pausa o navega dentro del video con los controles, la galería espera.
+- Las flechas y miniaturas cambian de medio en cualquier momento; el video anterior se
+  detiene y reinicia al inicio.
+- Al pasar el cursor (ratón) se pausa la navegación automática y el video activo; al salir
+  se reanudan, salvo que el usuario haya pausado el video él mismo.
+- En móvil, tocar solo suspende el temporizador de imágenes (5 s); nunca toca el reproductor
+  para no pisar sus controles.
+- Un placeholder o video con error se comporta como imagen (avanza cada 2.5 s).
 
 ## Agregar una propiedad
 
@@ -201,8 +214,9 @@ Miniaturas de video sin `poster`: la galería muestra el primer frame del video.
 
 2. Copiar la plantilla de abajo y llenar todos los campos.
 
-3. Si tiene imágenes o videos, colocarlos en `public/images/properties/{id}/` (o
-   `public/videos/properties/{id}/`) y referenciarlos con rutas absolutas.
+3. Si tiene imágenes, colocarlas en `public/images/properties/{id}/` y referenciarlas
+   con rutas absolutas. Los videos van como enlace de YouTube en `media` (no se guardan
+   archivos de video locales).
 
 4. Ejecutar `npm run build` para verificar que todo compila correctamente.
 
@@ -244,8 +258,8 @@ Abrir el archivo JSON correspondiente en `src/data/properties/` y modificar los 
 
 Eliminar el archivo JSON de `src/data/properties/`.
 
-Si la propiedad tenía imágenes o videos en `public/images/properties/{id}/` o
-`public/videos/properties/{id}/`, también eliminar esas carpetas.
+Si la propiedad tenía imágenes en `public/images/properties/{id}/`, también eliminar esa
+carpeta.
 
 ## Propiedades destacadas
 

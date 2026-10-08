@@ -9,26 +9,26 @@ import {
 export { FEATURES, getFeatureMeta };
 export type { FeatureKey, FeatureMeta, PropertyFeature };
 
+import {
+  getYoutubeThumb,
+  parseYoutubeId,
+  type YoutubeOrientation,
+} from "./youtube";
+
 export interface PropertyImageMedia {
   type?: "image";
   src: string;
   alt: string;
 }
 
-export interface PropertyVideoSource {
-  src: string;
-  type?: string;
-}
-
-export interface PropertyVideoMedia {
-  type: "video";
-  src: string;
+export interface PropertyYoutubeMedia {
+  type: "youtube";
+  url: string;
   alt: string;
-  poster?: string;
-  sources?: PropertyVideoSource[];
+  orientation?: YoutubeOrientation;
 }
 
-export type PropertyMedia = PropertyImageMedia | PropertyVideoMedia;
+export type PropertyMedia = PropertyImageMedia | PropertyYoutubeMedia;
 
 export interface Property {
   id: string;
@@ -54,44 +54,27 @@ export interface VisibleFeature {
   meta: FeatureMeta;
 }
 
-export function isVideo(media: PropertyMedia): media is PropertyVideoMedia {
-  if ("type" in media && media.type === "video") return true;
-  if ("type" in media && media.type) return false;
-  const src = "src" in media ? media.src : "";
-  return /\.(mp4|m4v|webm|ogv|ogg)([?#].*)?$/i.test(src);
+export function isYoutube(media: PropertyMedia): media is PropertyYoutubeMedia {
+  return "type" in media && media.type === "youtube";
 }
 
-export function videoMime(src: string): string | undefined {
-  const clean = src.split(/[?#]/)[0];
-  const ext = clean.includes(".") ? clean.split(".").pop()!.toLowerCase() : "";
-  switch (ext) {
-    case "mp4":
-    case "m4v":
-      return "video/mp4";
-    case "webm":
-      return "video/webm";
-    case "ogv":
-    case "ogg":
-      return "video/ogg";
-    default:
-      return undefined;
-  }
-}
-
-export function getVideoSources(item: PropertyVideoMedia): PropertyVideoSource[] {
-  const primary: PropertyVideoSource = { src: item.src, type: videoMime(item.src) };
-  return [primary, ...(item.sources ?? [])];
+export function getYoutubeId(media: PropertyYoutubeMedia): string | null {
+  return parseYoutubeId(media.url);
 }
 
 export function getFirstImage(property: Property): PropertyImageMedia | null {
   const image = property.media.find(
-    (item): item is PropertyImageMedia => !isVideo(item)
+    (item): item is PropertyImageMedia => !isYoutube(item)
   );
   if (image) return image;
-  const video = property.media.find(
-    (item): item is PropertyVideoMedia => isVideo(item) && Boolean(item.poster)
+  const youtube = property.media.find(
+    (item): item is PropertyYoutubeMedia =>
+      isYoutube(item) && parseYoutubeId(item.url) !== null
   );
-  if (video) return { src: video.poster!, alt: video.alt };
+  if (youtube) {
+    const id = parseYoutubeId(youtube.url)!;
+    return { src: getYoutubeThumb(id), alt: youtube.alt };
+  }
   return null;
 }
 

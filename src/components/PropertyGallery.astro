@@ -1,6 +1,11 @@
 ---
 import type { PropertyMedia } from "../data/properties";
-import { getVideoSources, isVideo } from "../data/properties";
+import { getYoutubeId, isYoutube } from "../data/properties";
+import {
+  getYoutubeThumb,
+  resolveYoutubeOrientation,
+  type YoutubeOrientation,
+} from "../data/youtube";
 
 interface Props {
   media: PropertyMedia[];
@@ -11,71 +16,91 @@ const { media, title } = Astro.props;
 
 const hasMedia = media.length > 0;
 const hasMultipleMedia = media.length > 1;
+
+type SlideModel =
+  | { kind: "image"; src: string; alt: string }
+  | {
+      kind: "youtube";
+      id: string | null;
+      orientation: YoutubeOrientation | null;
+      alt: string;
+    };
+
+const slides: SlideModel[] = media.map((item): SlideModel => {
+  if (isYoutube(item)) {
+    const id = getYoutubeId(item);
+    return {
+      kind: "youtube",
+      id,
+      orientation: id ? resolveYoutubeOrientation(item.url, item.orientation) : null,
+      alt: item.alt,
+    };
+  }
+  return { kind: "image", src: item.src, alt: item.alt };
+});
 ---
 
 <div class="gallery" data-gallery={hasMedia ? "" : undefined}>
   <div class="gallery__main">
     {hasMedia ? (
-      media.map((item, index) => {
-        const video = isVideo(item) ? item : null;
-        return (
-          <div
-            class:list={[
-              "gallery__slide",
-              { "gallery__slide--active": index === 0 },
-            ]}
-            data-slide
-            data-type={video ? "video" : "image"}
-          >
-            {video ? (
-              <>
-                {video.poster ? (
-                  <img
-                    class="gallery__bg"
-                    src={video.poster}
-                    alt=""
-                    aria-hidden="true"
-                  />
-                ) : (
-                  <video
-                    class="gallery__bg"
-                    src={video.src}
-                    muted
-                    playsinline
-                    preload="metadata"
-                    tabindex="-1"
-                    aria-hidden="true"
-                  />
-                )}
-                <video
-                  class="gallery__media"
-                  data-slide-video
-                  controls
-                  muted
-                  playsinline
-                  preload="metadata"
-                  poster={video.poster}
-                  aria-label={video.alt || title}
-                >
-                  {getVideoSources(video).map((source) => (
-                    <source src={source.src} type={source.type} />
-                  ))}
-                </video>
-              </>
-            ) : (
+      slides.map((slide, index) => (
+        <div
+          class:list={[
+            "gallery__slide",
+            { "gallery__slide--active": index === 0 },
+          ]}
+          data-slide
+          data-type={slide.kind}
+        >
+          {slide.kind === "youtube" ? (
+            slide.id ? (
               <>
                 <img
                   class="gallery__bg"
-                  src={item.src}
+                  src={getYoutubeThumb(slide.id)}
                   alt=""
                   aria-hidden="true"
                 />
-                <img class="gallery__media" src={item.src} alt={item.alt || title} />
+                <div
+                  class:list={[
+                    "gallery__yt-frame",
+                    { "gallery__yt-frame--portrait": slide.orientation === "portrait" },
+                  ]}
+                >
+                  <div data-yt-player data-video-id={slide.id}></div>
+                  <p class="gallery__yt-fallback">Video de YouTube no disponible</p>
+                </div>
               </>
-            )}
-          </div>
-        );
-      })
+            ) : (
+              <div class="gallery__placeholder">
+                <svg
+                  class="gallery__placeholder-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="9"/>
+                  <path d="M10 8.5l6 3.5-6 3.5z" fill="currentColor" stroke="none"/>
+                </svg>
+                <span>Video de YouTube próximamente</span>
+              </div>
+            )
+          ) : (
+            <>
+              <img
+                class="gallery__bg"
+                src={slide.src}
+                alt=""
+                aria-hidden="true"
+              />
+              <img class="gallery__media" src={slide.src} alt={slide.alt || title} />
+            </>
+          )}
+        </div>
+      ))
     ) : (
       <div class="gallery__placeholder">
         <svg class="gallery__placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -83,7 +108,7 @@ const hasMultipleMedia = media.length > 1;
           <circle cx="8.5" cy="8.5" r="1.5"/>
           <polyline points="21 15 16 10 5 21"/>
         </svg>
-        <span>Imágenes y videos próximamente</span>
+        <span>Imágenes próximamente</span>
       </div>
     )}
     <span class="gallery__counter" data-gallery-counter>
@@ -107,34 +132,21 @@ const hasMultipleMedia = media.length > 1;
 
   {hasMultipleMedia && (
     <div class="gallery__thumbnails">
-      {media.map((item, index) => {
-        const video = isVideo(item) ? item : null;
-        return (
-          <button
-            class:list={["gallery__thumb", { "gallery__thumb--active": index === 0 }]}
-            data-gallery-thumb={index}
-            aria-label={`Ver elemento ${index + 1}: ${item.alt}`}
-          >
-            {video ? (
+      {slides.map((slide, index) => (
+        <button
+          class:list={["gallery__thumb", { "gallery__thumb--active": index === 0 }]}
+          data-gallery-thumb={index}
+          aria-label={`Ver elemento ${index + 1}: ${slide.alt}`}
+        >
+          {slide.kind === "youtube" ? (
+            slide.id ? (
               <>
-                {video.poster ? (
-                  <img
-                    class="gallery__thumb-image"
-                    src={video.poster}
-                    alt={video.alt}
-                    loading="lazy"
-                  />
-                ) : (
-                  <video
-                    class="gallery__thumb-image"
-                    src={video.src}
-                    muted
-                    playsinline
-                    preload="metadata"
-                    tabindex="-1"
-                    aria-hidden="true"
-                  />
-                )}
+                <img
+                  class="gallery__thumb-image"
+                  src={getYoutubeThumb(slide.id)}
+                  alt={slide.alt}
+                  loading="lazy"
+                />
                 <span class="gallery__thumb-badge" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="currentColor">
                     <path d="M8 5v14l11-7z"/>
@@ -142,16 +154,22 @@ const hasMultipleMedia = media.length > 1;
                 </span>
               </>
             ) : (
-              <img
-                class="gallery__thumb-image"
-                src={item.src}
-                alt={item.alt}
-                loading="lazy"
-              />
-            )}
-          </button>
-        );
-      })}
+              <span class="gallery__thumb-image gallery__thumb-empty" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+              </span>
+            )
+          ) : (
+            <img
+              class="gallery__thumb-image"
+              src={slide.src}
+              alt={slide.alt}
+              loading="lazy"
+            />
+          )}
+        </button>
+      ))}
     </div>
   )}
 </div>
@@ -178,9 +196,20 @@ const hasMultipleMedia = media.length > 1;
       var touchSuspended = false;
       var pendingAdvance = false;
 
-      var states = [];
-      for (var s = 0; s < total; s++) {
-        states[s] = { pauseCause: null, userPaused: false, pausedByHover: false };
+      var yt = [];
+      for (var i = 0; i < total; i++) {
+        var playerEl = slides[i].querySelector("[data-yt-player]");
+        yt[i] = {
+          el: playerEl,
+          id: playerEl ? playerEl.getAttribute("data-video-id") : null,
+          player: null,
+          creating: false,
+          pendingPlay: false,
+          failed: false,
+          expectPause: false,
+          hoverPaused: false,
+          userPaused: false
+        };
       }
 
       function isSuspended() {
@@ -198,43 +227,207 @@ const hasMultipleMedia = media.length > 1;
         return slides[index].getAttribute("data-type");
       }
 
-      function videoAt(index) {
-        var slide = slides[index];
-        return slide ? slide.querySelector("[data-slide-video]") : null;
+      function ytInfo(index) {
+        return yt[index] || null;
       }
 
-      function playVideo(video) {
-        video.muted = true;
-        var playback = video.play();
-        if (playback && typeof playback.catch === "function") {
-          playback.catch(function () {});
+      function ytPlayable(index) {
+        var info = ytInfo(index);
+        return Boolean(info && info.id && !info.failed);
+      }
+
+      function playerState(info) {
+        try {
+          return info.player.getPlayerState();
+        } catch (error) {
+          return null;
         }
       }
 
-      function stopVideos() {
-        for (var i = 0; i < total; i++) {
-          var video = videoAt(i);
-          if (!video) continue;
-          if (!video.paused) states[i].pauseCause = "switch";
-          video.pause();
+      function loadYoutubeApi() {
+        if (window.YT && window.YT.Player) return Promise.resolve();
+        if (!window.__galleryYtApi) {
+          window.__galleryYtApi = new Promise(function (resolve, reject) {
+            var previous = window.onYouTubeIframeAPIReady;
+            window.onYouTubeIframeAPIReady = function () {
+              if (previous) previous();
+              resolve();
+            };
+            var tag = document.createElement("script");
+            tag.src = "https://www.youtube.com/iframe_api";
+            tag.onerror = function () {
+              window.__galleryYtApi = null;
+              reject(new Error("YouTube IFrame API failed to load"));
+            };
+            document.head.appendChild(tag);
+          });
+        }
+        return window.__galleryYtApi;
+      }
+
+      function startPlay(info) {
+        try {
+          info.player.mute();
+          info.player.loadVideoById(info.id);
+        } catch (error) {
+          /* ignore player errors */
+        }
+      }
+
+      function handleYtState(index, data) {
+        var info = ytInfo(index);
+        if (!info) return;
+        var ytStates = window.YT && window.YT.PlayerState;
+        if (!ytStates) return;
+
+        if (data === ytStates.ENDED) {
+          info.expectPause = false;
+          info.hoverPaused = false;
+          info.userPaused = false;
+          if (index !== current) return;
+          if (isSuspended()) {
+            pendingAdvance = true;
+            return;
+          }
+          goTo(index + 1);
+          return;
+        }
+
+        if (data === ytStates.PLAYING) {
+          info.expectPause = false;
+          info.hoverPaused = false;
+          info.userPaused = false;
+          return;
+        }
+
+        if (data === ytStates.PAUSED) {
+          if (info.expectPause) {
+            info.expectPause = false;
+            info.hoverPaused = true;
+          } else {
+            info.userPaused = true;
+          }
+        }
+      }
+
+      function handleYtError(index) {
+        var info = ytInfo(index);
+        if (!info) return;
+        info.failed = true;
+        info.creating = false;
+        info.pendingPlay = false;
+        if (info.player) {
           try {
-            video.currentTime = 0;
+            info.player.destroy();
           } catch (error) {
-            /* ignore seek errors */
+            /* ignore destroy errors */
+          }
+          info.player = null;
+        }
+        var frame = slides[index].querySelector(".gallery__yt-frame");
+        if (frame) frame.classList.add("gallery__yt-frame--failed");
+        if (index === current) scheduleImage();
+      }
+
+      function ensurePlayer(index) {
+        var info = ytInfo(index);
+        if (!info || !info.el || !info.id || info.failed || info.player || info.creating) return;
+        info.creating = true;
+        loadYoutubeApi()
+          .then(function () {
+            try {
+              info.player = new window.YT.Player(info.el, {
+                videoId: info.id,
+                host: "https://www.youtube-nocookie.com",
+                playerVars: {
+                  autoplay: 0,
+                  controls: 1,
+                  enablejsapi: 1,
+                  modestbranding: 1,
+                  playsinline: 1,
+                  rel: 0
+                },
+                events: {
+                  onReady: function (event) {
+                    info.creating = false;
+                    try {
+                      event.target.mute();
+                    } catch (error) {
+                      /* ignore mute errors */
+                    }
+                    if (!info.pendingPlay) return;
+                    info.pendingPlay = false;
+                    if (index !== current || info.failed) return;
+                    if (hoverActive) {
+                      info.hoverPaused = true;
+                      return;
+                    }
+                    startPlay(info);
+                  },
+                  onStateChange: function (event) {
+                    handleYtState(index, event.data);
+                  },
+                  onError: function () {
+                    handleYtError(index);
+                  }
+                }
+              });
+            } catch (error) {
+              handleYtError(index);
+            }
+          })
+          .catch(function () {
+            handleYtError(index);
+          });
+      }
+
+      function stopAllYoutube() {
+        for (var i = 0; i < total; i++) {
+          var info = ytInfo(i);
+          if (!info) continue;
+          info.pendingPlay = false;
+          info.expectPause = false;
+          info.hoverPaused = false;
+          info.userPaused = false;
+          if (info.player) {
+            try {
+              info.player.stopVideo();
+            } catch (error) {
+              /* ignore stop errors */
+            }
           }
         }
       }
 
       function playActive() {
-        if (typeAt(current) !== "video") return;
-        var video = videoAt(current);
-        if (!video) return;
-        playVideo(video);
+        if (typeAt(current) !== "youtube") return;
+        var info = ytInfo(current);
+        if (!info || !info.id || info.failed) return;
+        info.pendingPlay = false;
+        info.expectPause = false;
+        info.hoverPaused = false;
+        info.userPaused = false;
+        ensurePlayer(current);
+        if (hoverActive) {
+          info.hoverPaused = true;
+          return;
+        }
+        if (info.player) {
+          startPlay(info);
+          return;
+        }
+        info.pendingPlay = true;
       }
 
       function scheduleImage() {
         clearTimer();
-        if (isSuspended() || total < 2 || typeAt(current) !== "image") return;
+        if (isSuspended() || total < 2) return;
+        var type = typeAt(current);
+        if (type === "youtube") {
+          if (ytPlayable(current)) return;
+        } else if (type !== "image") {
+          return;
+        }
         timer = setTimeout(function () {
           goTo(current + 1);
         }, 2500);
@@ -244,8 +437,7 @@ const hasMultipleMedia = media.length > 1;
         current = ((index % total) + total) % total;
         clearTimer();
         pendingAdvance = false;
-        stopVideos();
-        states[current] = { pauseCause: null, userPaused: false, pausedByHover: false };
+        stopAllYoutube();
         for (var i = 0; i < total; i++) {
           slides[i].classList.toggle("gallery__slide--active", i === current);
           if (thumbs[i]) {
@@ -260,12 +452,18 @@ const hasMultipleMedia = media.length > 1;
       function suspendForMouse() {
         hoverActive = true;
         clearTimer();
-        if (typeAt(current) !== "video") return;
-        var video = videoAt(current);
-        var state = states[current];
-        if (video && !video.paused && !video.ended) {
-          state.pauseCause = "hover";
-          video.pause();
+        if (typeAt(current) !== "youtube") return;
+        var info = ytInfo(current);
+        if (!info || !info.player || info.failed) return;
+        var ytStates = window.YT && window.YT.PlayerState;
+        if (!ytStates) return;
+        if (playerState(info) === ytStates.PLAYING) {
+          info.expectPause = true;
+          try {
+            info.player.pauseVideo();
+          } catch (error) {
+            info.expectPause = false;
+          }
         }
       }
 
@@ -276,56 +474,24 @@ const hasMultipleMedia = media.length > 1;
           goTo(current + 1);
           return;
         }
-        if (typeAt(current) === "video") {
-          var video = videoAt(current);
-          var state = states[current];
+        if (typeAt(current) === "youtube") {
+          var info = ytInfo(current);
           if (
-            video &&
-            state.pausedByHover &&
-            !state.userPaused &&
-            video.paused &&
-            !video.ended
+            info &&
+            info.player &&
+            !info.failed &&
+            info.hoverPaused &&
+            !info.userPaused
           ) {
-            state.pausedByHover = false;
-            playVideo(video);
+            info.hoverPaused = false;
+            try {
+              info.player.playVideo();
+            } catch (error) {
+              /* ignore play errors */
+            }
           }
         }
         scheduleImage();
-      }
-
-      for (var i = 0; i < total; i++) {
-        (function (index) {
-          var video = videoAt(index);
-          if (!video) return;
-          var state = states[index];
-
-          video.addEventListener("play", function () {
-            state.userPaused = false;
-            state.pausedByHover = false;
-          });
-
-          video.addEventListener("pause", function () {
-            if (state.pauseCause === "hover") {
-              state.pausedByHover = true;
-              state.pauseCause = null;
-              return;
-            }
-            if (state.pauseCause === "switch") {
-              state.pauseCause = null;
-              return;
-            }
-            state.userPaused = true;
-          });
-
-          video.addEventListener("ended", function () {
-            if (index !== current) return;
-            if (isSuspended()) {
-              pendingAdvance = true;
-              return;
-            }
-            goTo(index + 1);
-          });
-        })(i);
       }
 
       gallery.addEventListener("pointerenter", function (event) {
@@ -405,6 +571,12 @@ const hasMultipleMedia = media.length > 1;
     display: block;
   }
 
+  .gallery__slide--active[data-type="youtube"] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .gallery__bg {
     position: absolute;
     inset: 0;
@@ -422,6 +594,51 @@ const hasMultipleMedia = media.length > 1;
     height: 100%;
     object-fit: contain;
     display: block;
+  }
+
+  .gallery__yt-frame {
+    position: relative;
+    width: 100%;
+    max-height: 100%;
+    aspect-ratio: 16 / 9;
+  }
+
+  .gallery__yt-frame--portrait {
+    width: auto;
+    height: 100%;
+    aspect-ratio: 9 / 16;
+  }
+
+  .gallery__yt-frame [data-yt-player],
+  .gallery__yt-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .gallery__yt-fallback {
+    display: none;
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 1rem;
+    background-color: var(--color-gray-200);
+    color: var(--color-gray-400);
+    font-size: 0.875rem;
+  }
+
+  .gallery__yt-frame--failed [data-yt-player],
+  .gallery__yt-frame--failed iframe {
+    display: none;
+  }
+
+  .gallery__yt-frame--failed .gallery__yt-fallback {
+    display: flex;
   }
 
   .gallery__placeholder {
@@ -458,7 +675,7 @@ const hasMultipleMedia = media.length > 1;
     z-index: 2;
   }
 
-  .gallery__main:has(.gallery__slide--active[data-type="video"]) .gallery__counter {
+  .gallery__main:has(.gallery__slide--active[data-type="youtube"]) .gallery__counter {
     bottom: auto;
     top: 12px;
   }
@@ -558,6 +775,20 @@ const hasMultipleMedia = media.length > 1;
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+
+  .gallery__thumb-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--color-gray-200), var(--color-gray-300));
+    color: var(--color-gray-400);
+  }
+
+  .gallery__thumb-empty svg {
+    width: 18px;
+    height: 18px;
+    opacity: 0.7;
   }
 
   .gallery__thumb-badge {
