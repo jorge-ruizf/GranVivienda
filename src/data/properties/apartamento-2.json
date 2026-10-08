@@ -1,23 +1,49 @@
 {
   "id": "apartamento-2",
-  "slug": "apartamento-acogedor-el-poblado",
-  "title": "Apartamento acogedor en El Poblado",
+  "slug": "apartamento-santa-monica-2",
+  "title": "Apartamento en Santa Mónica",
   "operation": "rent",
   "propertyType": "apartment",
-  "price": 2200000,
+  "price": 1800000,
   "currency": "COP",
   "location": {
     "city": "Medellín",
-    "neighborhood": "El Poblado"
+    "neighborhood": "Santa Mónica"
   },
-  "description": "Acogedor apartamento de 2 habitaciones en uno de los barrios más prestigiosos de Medellín. Cerca a restaurantes, parques y vida nocturna. Ideal para profesionales jóvenes que buscan comodidad y ubicación privilegiada.",
-  "bedrooms": 2,
-  "bathrooms": 1,
-  "area": 55,
-  "images": [
-    { "src": "/images/properties/apartamento-2/sala.jpg", "alt": "Sala con decoración moderna" },
-    { "src": "/images/properties/apartamento-2/cocina.jpg", "alt": "Cocina tipo americana" },
-    { "src": "/images/properties/apartamento-2/habitacion.jpg", "alt": "Habitación con vista exterior" }
+  "description": [
+    "El apartamento cuenta con",
+    "- Dos habitaciones",
+    "- Un baño encabinado",
+    "- Zona húmeda independiente de la cocina",
+    "- Cocina integral con red de gas",
+    "- Comedor",
+    "- Sala",
+    "Está ubicado en una bella zona verde, sector muy tranquilo y acceso a buen transporte público",
+    "Primer piso",
+    "REQUISITO PRINCIPAL:",
+    "fiador con propiedad raíz, sin afectación familiar, no embargo ni hipoteca,",
+    "o dos fiadores q demuestren ingresos al valor doble del canon."
   ],
-  "featured": false
+  "media": [
+    { "src": "/images/properties/apartamento-2/WhatsApp Image 2026-10-06 at 4.27.02 PM.jpeg", "alt": "Baño con acabados en azul" },
+    { "src": "/images/properties/apartamento-2/WhatsApp Image 2026-10-06 at 4.27.02 PM (1).jpeg", "alt": "Sala con acceso a la cocina" },
+    { "src": "/images/properties/apartamento-2/WhatsApp Image 2026-10-06 at 4.27.02 PM (2).jpeg", "alt": "Habitación con closet y ventana" },
+    { "src": "/images/properties/apartamento-2/WhatsApp Image 2026-10-06 at 4.27.02 PM (3).jpeg", "alt": "Habitación con ventana y closet" },
+    { "src": "/images/properties/apartamento-2/WhatsApp Image 2026-10-06 at 4.27.03 PM.jpeg", "alt": "Cocina y puerta principal" },
+    { "src": "/images/properties/apartamento-2/WhatsApp Image 2026-10-06 at 4.27.03 PM (1).jpeg", "alt": "Habitación con closet" },
+    { "src": "/images/properties/apartamento-2/WhatsApp Image 2026-10-06 at 4.27.03 PM (2).jpeg", "alt": "Habitación con ventana y closet" },
+    { "src": "/images/properties/apartamento-2/WhatsApp Image 2026-10-06 at 4.27.04 PM.jpeg", "alt": "Vestidor y puerta de habitación" },
+    { "src": "/images/properties/apartamento-2/WhatsApp Image 2026-10-06 at 4.27.04 PM (1).jpeg", "alt": "Escalera y acceso a la propiedad" },
+    {
+      "type": "video",
+      "src": "/images/properties/apartamento-2/WhatsApp Video 2026-10-06 at 4.27.03 PM.mp4",
+      "alt": "Recorrido en video de la propiedad"
+    }
+  ],
+  "features": [
+    { "key": "bedrooms", "value": 2 },
+    { "key": "bathrooms", "value": 1 },
+    { "key": "laundry", "value": 1}
+  ],
+  "featured": true
 }

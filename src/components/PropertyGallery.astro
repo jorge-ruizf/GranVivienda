@@ -1,36 +1,81 @@
 ---
-import type { PropertyImage } from "../data/properties";
+import type { PropertyMedia } from "../data/properties";
+import { getVideoSources, isVideo } from "../data/properties";
 
 interface Props {
-  images: PropertyImage[];
+  media: PropertyMedia[];
   title: string;
 }
 
-const { images, title } = Astro.props;
+const { media, title } = Astro.props;
 
-const hasImages = images.length > 0;
-const mainImage = hasImages ? images[0] : null;
-const hasMultipleImages = images.length > 1;
+const hasMedia = media.length > 0;
+const hasMultipleMedia = media.length > 1;
 ---
 
-<div class="gallery" data-gallery={hasMultipleImages ? "" : undefined}>
+<div class="gallery" data-gallery={hasMedia ? "" : undefined}>
   <div class="gallery__main">
-    {hasImages ? (
-      <div class="gallery__image-container">
-        <img
-          class="gallery__bg"
-          src={mainImage!.src}
-          alt=""
-          aria-hidden="true"
-          data-gallery-bg
-        />
-        <img
-          class="gallery__main-image"
-          src={mainImage!.src}
-          alt={mainImage!.alt || title}
-          data-gallery-main
-        />
-      </div>
+    {hasMedia ? (
+      media.map((item, index) => {
+        const video = isVideo(item) ? item : null;
+        return (
+          <div
+            class:list={[
+              "gallery__slide",
+              { "gallery__slide--active": index === 0 },
+            ]}
+            data-slide
+            data-type={video ? "video" : "image"}
+          >
+            {video ? (
+              <>
+                {video.poster ? (
+                  <img
+                    class="gallery__bg"
+                    src={video.poster}
+                    alt=""
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <video
+                    class="gallery__bg"
+                    src={video.src}
+                    muted
+                    playsinline
+                    preload="metadata"
+                    tabindex="-1"
+                    aria-hidden="true"
+                  />
+                )}
+                <video
+                  class="gallery__media"
+                  data-slide-video
+                  controls
+                  muted
+                  playsinline
+                  preload="metadata"
+                  poster={video.poster}
+                  aria-label={video.alt || title}
+                >
+                  {getVideoSources(video).map((source) => (
+                    <source src={source.src} type={source.type} />
+                  ))}
+                </video>
+              </>
+            ) : (
+              <>
+                <img
+                  class="gallery__bg"
+                  src={item.src}
+                  alt=""
+                  aria-hidden="true"
+                />
+                <img class="gallery__media" src={item.src} alt={item.alt || title} />
+              </>
+            )}
+          </div>
+        );
+      })
     ) : (
       <div class="gallery__placeholder">
         <svg class="gallery__placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -38,21 +83,21 @@ const hasMultipleImages = images.length > 1;
           <circle cx="8.5" cy="8.5" r="1.5"/>
           <polyline points="21 15 16 10 5 21"/>
         </svg>
-        <span>Imágenes próximamente</span>
+        <span>Imágenes y videos próximamente</span>
       </div>
     )}
     <span class="gallery__counter" data-gallery-counter>
-      {hasImages ? `1 / ${images.length}` : "0 / 0"}
+      {hasMedia ? `1 / ${media.length}` : "0 / 0"}
     </span>
-    {hasMultipleImages && (
-      <button class="gallery__arrow gallery__arrow--prev" data-gallery-prev aria-label="Imagen anterior">
+    {hasMultipleMedia && (
+      <button class="gallery__arrow gallery__arrow--prev" data-gallery-prev aria-label="Anterior">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="15 18 9 12 15 6"/>
         </svg>
       </button>
     )}
-    {hasMultipleImages && (
-      <button class="gallery__arrow gallery__arrow--next" data-gallery-next aria-label="Imagen siguiente">
+    {hasMultipleMedia && (
+      <button class="gallery__arrow gallery__arrow--next" data-gallery-next aria-label="Siguiente">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="9 18 15 12 9 6"/>
         </svg>
@@ -60,76 +105,271 @@ const hasMultipleImages = images.length > 1;
     )}
   </div>
 
-  {hasMultipleImages && (
+  {hasMultipleMedia && (
     <div class="gallery__thumbnails">
-      {images.map((image, index) => (
-        <button
-          class:list={["gallery__thumb", { "gallery__thumb--active": index === 0 }]}
-          data-gallery-thumb={index}
-          aria-label={`Ver imagen ${index + 1}: ${image.alt}`}
-        >
-          <img
-            class="gallery__thumb-image"
-            src={image.src}
-            alt={image.alt}
-            loading="lazy"
-          />
-        </button>
-      ))}
+      {media.map((item, index) => {
+        const video = isVideo(item) ? item : null;
+        return (
+          <button
+            class:list={["gallery__thumb", { "gallery__thumb--active": index === 0 }]}
+            data-gallery-thumb={index}
+            aria-label={`Ver elemento ${index + 1}: ${item.alt}`}
+          >
+            {video ? (
+              <>
+                {video.poster ? (
+                  <img
+                    class="gallery__thumb-image"
+                    src={video.poster}
+                    alt={video.alt}
+                    loading="lazy"
+                  />
+                ) : (
+                  <video
+                    class="gallery__thumb-image"
+                    src={video.src}
+                    muted
+                    playsinline
+                    preload="metadata"
+                    tabindex="-1"
+                    aria-hidden="true"
+                  />
+                )}
+                <span class="gallery__thumb-badge" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                </span>
+              </>
+            ) : (
+              <img
+                class="gallery__thumb-image"
+                src={item.src}
+                alt={item.alt}
+                loading="lazy"
+              />
+            )}
+          </button>
+        );
+      })}
     </div>
   )}
 </div>
 
 <script>
   function initGallery() {
-    document.querySelectorAll("[data-gallery]").forEach(function(gallery) {
-      var mainImg = gallery.querySelector("[data-gallery-main]");
-      var bgImg = gallery.querySelector("[data-gallery-bg]");
+    document.querySelectorAll("[data-gallery]").forEach(function (gallery) {
+      if (gallery.hasAttribute("data-gallery-ready")) return;
+      gallery.setAttribute("data-gallery-ready", "");
+
+      var slides = gallery.querySelectorAll("[data-slide]");
+      var total = slides.length;
+      if (!total) return;
+
       var counter = gallery.querySelector("[data-gallery-counter]");
       var prevBtn = gallery.querySelector("[data-gallery-prev]");
       var nextBtn = gallery.querySelector("[data-gallery-next]");
       var thumbs = gallery.querySelectorAll("[data-gallery-thumb]");
-      var total = thumbs.length;
-      if (!mainImg || total < 2) return;
 
       var current = 0;
       var timer = null;
+      var touchTimer = null;
+      var hoverActive = false;
+      var touchSuspended = false;
+      var pendingAdvance = false;
 
-      function goTo(idx) {
-        current = ((idx % total) + total) % total;
-        var img = thumbs[current].querySelector("img");
-        if (img) {
-          mainImg.src = img.src;
-          mainImg.alt = img.alt;
-          if (bgImg) bgImg.src = img.src;
+      var states = [];
+      for (var s = 0; s < total; s++) {
+        states[s] = { pauseCause: null, userPaused: false, pausedByHover: false };
+      }
+
+      function isSuspended() {
+        return hoverActive || touchSuspended;
+      }
+
+      function clearTimer() {
+        if (timer !== null) {
+          clearTimeout(timer);
+          timer = null;
         }
-        thumbs.forEach(function(t) { t.classList.remove("gallery__thumb--active"); });
-        thumbs[current].classList.add("gallery__thumb--active");
-        if (counter) counter.textContent = (current + 1) + " / " + total;
       }
 
-      function startAuto() {
-        stopAuto();
-        timer = setInterval(function() { goTo(current + 1); }, 2500);
+      function typeAt(index) {
+        return slides[index].getAttribute("data-type");
       }
 
-      function stopAuto() {
-        if (timer !== null) { clearInterval(timer); timer = null; }
+      function videoAt(index) {
+        var slide = slides[index];
+        return slide ? slide.querySelector("[data-slide-video]") : null;
       }
 
-      gallery.addEventListener("mouseenter", stopAuto);
-      gallery.addEventListener("mouseleave", startAuto);
-      gallery.addEventListener("touchstart", stopAuto, { passive: true });
-      gallery.addEventListener("touchend", function() { setTimeout(startAuto, 5000); }, { passive: true });
+      function playVideo(video) {
+        video.muted = true;
+        var playback = video.play();
+        if (playback && typeof playback.catch === "function") {
+          playback.catch(function () {});
+        }
+      }
 
-      if (prevBtn) prevBtn.addEventListener("click", function() { goTo(current - 1); startAuto(); });
-      if (nextBtn) nextBtn.addEventListener("click", function() { goTo(current + 1); startAuto(); });
+      function stopVideos() {
+        for (var i = 0; i < total; i++) {
+          var video = videoAt(i);
+          if (!video) continue;
+          if (!video.paused) states[i].pauseCause = "switch";
+          video.pause();
+          try {
+            video.currentTime = 0;
+          } catch (error) {
+            /* ignore seek errors */
+          }
+        }
+      }
 
-      thumbs.forEach(function(thumb, i) {
-        thumb.addEventListener("click", function() { goTo(i); startAuto(); });
+      function playActive() {
+        if (typeAt(current) !== "video") return;
+        var video = videoAt(current);
+        if (!video) return;
+        playVideo(video);
+      }
+
+      function scheduleImage() {
+        clearTimer();
+        if (isSuspended() || total < 2 || typeAt(current) !== "image") return;
+        timer = setTimeout(function () {
+          goTo(current + 1);
+        }, 2500);
+      }
+
+      function goTo(index) {
+        current = ((index % total) + total) % total;
+        clearTimer();
+        pendingAdvance = false;
+        stopVideos();
+        states[current] = { pauseCause: null, userPaused: false, pausedByHover: false };
+        for (var i = 0; i < total; i++) {
+          slides[i].classList.toggle("gallery__slide--active", i === current);
+          if (thumbs[i]) {
+            thumbs[i].classList.toggle("gallery__thumb--active", i === current);
+          }
+        }
+        if (counter) counter.textContent = current + 1 + " / " + total;
+        playActive();
+        scheduleImage();
+      }
+
+      function suspendForMouse() {
+        hoverActive = true;
+        clearTimer();
+        if (typeAt(current) !== "video") return;
+        var video = videoAt(current);
+        var state = states[current];
+        if (video && !video.paused && !video.ended) {
+          state.pauseCause = "hover";
+          video.pause();
+        }
+      }
+
+      function maybeResume() {
+        if (isSuspended()) return;
+        if (pendingAdvance) {
+          pendingAdvance = false;
+          goTo(current + 1);
+          return;
+        }
+        if (typeAt(current) === "video") {
+          var video = videoAt(current);
+          var state = states[current];
+          if (
+            video &&
+            state.pausedByHover &&
+            !state.userPaused &&
+            video.paused &&
+            !video.ended
+          ) {
+            state.pausedByHover = false;
+            playVideo(video);
+          }
+        }
+        scheduleImage();
+      }
+
+      for (var i = 0; i < total; i++) {
+        (function (index) {
+          var video = videoAt(index);
+          if (!video) return;
+          var state = states[index];
+
+          video.addEventListener("play", function () {
+            state.userPaused = false;
+            state.pausedByHover = false;
+          });
+
+          video.addEventListener("pause", function () {
+            if (state.pauseCause === "hover") {
+              state.pausedByHover = true;
+              state.pauseCause = null;
+              return;
+            }
+            if (state.pauseCause === "switch") {
+              state.pauseCause = null;
+              return;
+            }
+            state.userPaused = true;
+          });
+
+          video.addEventListener("ended", function () {
+            if (index !== current) return;
+            if (isSuspended()) {
+              pendingAdvance = true;
+              return;
+            }
+            goTo(index + 1);
+          });
+        })(i);
+      }
+
+      gallery.addEventListener("pointerenter", function (event) {
+        if (event.pointerType === "mouse") suspendForMouse();
       });
 
-      startAuto();
+      gallery.addEventListener("pointerleave", function (event) {
+        if (event.pointerType !== "mouse") return;
+        hoverActive = false;
+        maybeResume();
+      });
+
+      gallery.addEventListener("touchstart", function () {
+        touchSuspended = true;
+        clearTimer();
+      }, { passive: true });
+
+      gallery.addEventListener("touchend", function () {
+        if (touchTimer !== null) clearTimeout(touchTimer);
+        touchTimer = setTimeout(function () {
+          touchTimer = null;
+          touchSuspended = false;
+          maybeResume();
+        }, 5000);
+      }, { passive: true });
+
+      if (prevBtn) {
+        prevBtn.addEventListener("click", function () {
+          goTo(current - 1);
+        });
+      }
+      if (nextBtn) {
+        nextBtn.addEventListener("click", function () {
+          goTo(current + 1);
+        });
+      }
+
+      thumbs.forEach(function (thumb, index) {
+        thumb.addEventListener("click", function () {
+          goTo(index);
+        });
+      });
+
+      goTo(0);
     });
   }
 
@@ -154,14 +394,15 @@ const hasMultipleImages = images.length > 1;
     background: linear-gradient(135deg, var(--color-gray-200), var(--color-gray-300));
   }
 
-  .gallery__image-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--color-gray-100);
+  .gallery__slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    background-color: var(--color-gray-100);
+  }
+
+  .gallery__slide--active {
+    display: block;
   }
 
   .gallery__bg {
@@ -175,11 +416,12 @@ const hasMultipleImages = images.length > 1;
     pointer-events: none;
   }
 
-  .gallery__main-image {
+  .gallery__media {
     position: relative;
     width: 100%;
     height: 100%;
     object-fit: contain;
+    display: block;
   }
 
   .gallery__placeholder {
@@ -214,6 +456,11 @@ const hasMultipleImages = images.length > 1;
     font-size: 0.8125rem;
     font-weight: 500;
     z-index: 2;
+  }
+
+  .gallery__main:has(.gallery__slide--active[data-type="video"]) .gallery__counter {
+    bottom: auto;
+    top: 12px;
   }
 
   .gallery__arrow {
@@ -283,6 +530,7 @@ const hasMultipleImages = images.length > 1;
   }
 
   .gallery__thumb {
+    position: relative;
     flex-shrink: 0;
     width: 72px;
     height: 62px;
@@ -306,9 +554,29 @@ const hasMultipleImages = images.length > 1;
   }
 
   .gallery__thumb-image {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+
+  .gallery__thumb-badge {
+    position: absolute;
+    right: 3px;
+    bottom: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.65);
+    color: var(--color-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .gallery__thumb-badge svg {
+    width: 10px;
+    height: 10px;
   }
 
   @media (max-width: 1000px) {

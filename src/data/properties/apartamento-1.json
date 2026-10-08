@@ -1,38 +1,41 @@
 {
   "id": "apartamento-1",
-  "slug": "apartamento-san-javier",
-  "title": "Apartamento en San Javier",
-  "operation": "sale",
+  "slug": "apartamento-en-santa-monica",
+  "title": "Apartamento en Santa Mónica",
+  "operation": "rent",
   "propertyType": "apartment",
-  "price": 230000000,
+  "price": 1800000,
   "currency": "COP",
   "location": {
     "city": "Medellín",
-    "neighborhood": "San Javier"
+    "neighborhood": "Santa Mónica"
   },
-  "description": "Amplio apartamento de 3 habitaciones en San Javier. Cuenta con multiples habitaciones y dos pisos.",
-  "bedrooms": 3,
-  "bathrooms": 2,
-  "area": 77,
-"images": [
-    { "src": "/images/properties/apartamento-1/entrada.jpg", "alt": "Entrada" },
-    { "src": "/images/properties/apartamento-1/sala-1.jpg", "alt": "Sala 1" },
-    { "src": "/images/properties/apartamento-1/sala-2.jpg", "alt": "Sala 2" },
-    { "src": "/images/properties/apartamento-1/sala-3.jpg", "alt": "Sala 3" },
-    { "src": "/images/properties/apartamento-1/cocina-1.jpg", "alt": "Cocina 1" },
-    { "src": "/images/properties/apartamento-1/cocina-2.jpg", "alt": "Cocina 2" },
-    { "src": "/images/properties/apartamento-1/bano-1.jpg", "alt": "Baño 1" },
-    { "src": "/images/properties/apartamento-1/habitacion-1.jpg", "alt": "Habitación 1" },
-    { "src": "/images/properties/apartamento-1/sala-4.jpg", "alt": "Sala 4" },
-    { "src": "/images/properties/apartamento-1/sala-5.jpg", "alt": "Sala 5" },
-    { "src": "/images/properties/apartamento-1/escaleras.jpg", "alt": "Escaleras" },
-    { "src": "/images/properties/apartamento-1/habitacion-2.jpg", "alt": "Habitación 2" },
-    { "src": "/images/properties/apartamento-1/habitacion-3.jpg", "alt": "Habitación 3" },
-    { "src": "/images/properties/apartamento-1/habitacion-4.jpg", "alt": "Habitación 4" },
-    { "src": "/images/properties/apartamento-1/habitacion-5.jpg", "alt": "Habitación 5" },
-    { "src": "/images/properties/apartamento-1/habitacion-6.jpg", "alt": "Habitación 6" },
-    { "src": "/images/properties/apartamento-1/bano-2.jpg", "alt": "Baño 2" },
-    { "src": "/images/properties/apartamento-1/patio.jpg", "alt": "Patio" }
+  "description": [
+    "El apartamento cuenta con",
+    "- Dos habitaciones",
+    "- Un baño encabinado",
+    "- Zona húmeda independiente de la cocina",
+    "- Cocina integral con red de gas",
+    "- Comedor",
+    "- Sala",
+    "Está ubicado en una bella zona verde, sector muy tranquilo y acceso a buen transporte público",
+    "Segundo piso",
+    "REQUISITO PRINCIPAL:",
+    "fiador con propiedad raíz, sin afectación familiar, no embargo ni hipoteca,",
+    "o dos fiadores q demuestren ingresos al valor doble del canon."
+  ],
+  "features": [
+    { "key": "bedrooms", "value": 2 },
+    { "key": "bathrooms", "value": 1 },
+    { "key": "laundry", "value": 1}
+  ],
+  "media": [
+    { "src": "/images/properties/apartamento-1/nombre-1.jpeg", "alt": "Señal de entrada del conjunto Luna del Viento" },
+    {
+      "type": "video",
+      "src": "/images/properties/apartamento-1/video-1.mp4",
+      "alt": "Recorrido en video de la propiedad"
+    }
   ],
   "featured": true
 }
